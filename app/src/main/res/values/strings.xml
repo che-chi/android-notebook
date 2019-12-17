@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">notebook</string>
+    <string name="contacts_title">联系人</string>
+    <string name="contacts_icon_desc">联系人头像</string>
+    <string name="notebook_title">便签</string>
+    <string name="user_title">""</string>
+    <string name="search_contacts_query_hint">搜索联系人</string>
+    <string name="search_notebook_query_hint">搜索便签</string>
+    <string name="item_contacts_expand">展开</string>
+    <string name="splash_jump_adv">跳过</string>
+    <string name="server_request_fail">服务器开小差了,请稍后再试</string>
+    <string name="search_item_text">搜索</string>
+</resources>
