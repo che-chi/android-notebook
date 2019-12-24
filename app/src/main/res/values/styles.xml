@@ -11,6 +11,12 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
+    <style name="AppThemeContacts" parent="Theme.AppCompat">
+        <item name="windowActionModeOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
 
     <style name="splash" parent="@style/Theme.Design.NoActionBar">
         <item name="android:windowBackground">@drawable/layer_splash</item>

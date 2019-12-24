@@ -27,6 +27,10 @@ public class NotebookFragment extends Fragment {
     @BindView(R.id.stop_service)
     Button stopService;
 
+    public static NotebookFragment newInstance() {
+        return new NotebookFragment();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

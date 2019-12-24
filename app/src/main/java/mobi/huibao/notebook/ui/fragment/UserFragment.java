@@ -24,6 +24,10 @@ public class UserFragment extends Fragment {
     @BindView(R.id.start_command_2)
     Button startCommand2;
 
+    public static UserFragment newInstance() {
+        return new UserFragment();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

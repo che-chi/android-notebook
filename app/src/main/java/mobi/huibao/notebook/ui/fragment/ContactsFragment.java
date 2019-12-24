@@ -50,10 +50,6 @@ public class ContactsFragment extends Fragment {
     @BindView(R.id.refresh_layout)
     RefreshLayout refresh;
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-
-
     final ContactsItemAdapter adapter = new ContactsItemAdapter(R.layout.item_contacts);
 
     private int page = 0;
@@ -166,23 +162,16 @@ public class ContactsFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        inflater.inflate(R.menu.main, menu);
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_note_search).getActionView();
-        searchView.setQueryHint("搜索联系人");
-    }
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
 
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         final View rootView = inflater.inflate(R.layout.fragment_contacts, container, false);
         ButterKnife.bind(this, rootView);
-        setHasOptionsMenu(true);
+
         eventBusRegister();
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(toolbar);
 
         initRecyclerView(rootView);
         initRefreshListener(refresh, adapter);

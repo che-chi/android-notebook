@@ -33,7 +33,7 @@
 
         <activity
             android:name=".ui.activity.MainActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppThemeContacts" />
 
         <service android:name=".service.ContactsService" />
 
