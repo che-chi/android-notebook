@@ -14,9 +14,11 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Set;
 
-public class HanLPTokenizer extends Tokenizer {
+public class IndexTokenizer extends Tokenizer {
+
     // 当前词
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     // 偏移量
@@ -26,7 +28,7 @@ public class HanLPTokenizer extends Tokenizer {
     // 词性
     private TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
 
-    private SegmentWrapper segment;
+    private IndexSegmentWrapper segment;
     private BinTrie<String> filter;
     private boolean enablePorterStemming;
     private final PorterStemmer stemmer = new PorterStemmer();
@@ -41,15 +43,13 @@ public class HanLPTokenizer extends Tokenizer {
      * @param filter               停用词
      * @param enablePorterStemming 英文原型转换
      */
-    public HanLPTokenizer(Segment segment, Set<String> filter, boolean enablePorterStemming)
-    {
+    public IndexTokenizer(Segment segment, Set<String> filter, boolean enablePorterStemming, final Reader reader) {
         super();
-        this.segment = new SegmentWrapper(input, segment);
-        if (filter != null && filter.size() > 0)
-        {
+        this.input = reader;
+        this.segment = new IndexSegmentWrapper(input, segment);
+        if (filter != null && filter.size() > 0) {
             this.filter = new BinTrie<String>();
-            for (String stopWord : filter)
-            {
+            for (String stopWord : filter) {
                 this.filter.put(stopWord, null);
             }
         }
@@ -57,59 +57,48 @@ public class HanLPTokenizer extends Tokenizer {
     }
 
     @Override
-    final public boolean incrementToken() throws IOException
-    {
+    final public boolean incrementToken() throws IOException {
         clearAttributes();
         int position = 0;
         Term term;
         boolean un_increased = true;
-        do
-        {
+        do {
             term = segment.next();
-            if (term == null)
-            {
+            if (term == null) {
                 break;
             }
             if (TextUtility.isBlank(term.word)) // 过滤掉空白符，提高索引效率
             {
                 continue;
             }
-            if (enablePorterStemming && term.nature == Nature.nx)
-            {
+            if (enablePorterStemming && term.nature == Nature.nx) {
                 term.word = stemmer.stem(term.word);
             }
 
-            if (filter != null && filter.containsKey(term.word))
-            {
+            if (filter != null && filter.containsKey(term.word)) {
                 continue;
-            }
-            else
-            {
+            } else {
                 ++position;
                 un_increased = false;
             }
         }
         while (un_increased);
 
-        if (term != null)
-        {
+        if (term != null) {
             positionAttr.setPositionIncrement(position);
             termAtt.setEmpty().append(term.word);
             offsetAtt.setOffset(correctOffset(totalOffset + term.offset),
                     correctOffset(totalOffset + term.offset + term.word.length()));
             typeAtt.setType(term.nature == null ? "null" : term.nature.toString());
             return true;
-        }
-        else
-        {
+        } else {
             totalOffset += segment.offset;
             return false;
         }
     }
 
     @Override
-    public void end() throws IOException
-    {
+    public void end() throws IOException {
         super.end();
         offsetAtt.setOffset(totalOffset, totalOffset);
         totalOffset = 0;
@@ -119,9 +108,8 @@ public class HanLPTokenizer extends Tokenizer {
      * 必须重载的方法，否则在批量索引文件时将会导致文件索引失败
      */
     @Override
-    public void reset() throws IOException
-    {
-        super.reset();
+    public void reset(final Reader reader) throws IOException {
+        super.reset(reader);
         segment.reset(new BufferedReader(this.input));
     }
 }

@@ -6,7 +6,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "mobi.huibao.notebook"
-        minSdkVersion 26
+        minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -78,10 +78,10 @@ dependencies {
 
     implementation group: 'com.hankcs', name: 'hanlp', version: 'portable-1.7.5'
 
-    implementation group: 'org.apache.lucene', name: 'lucene-core', version: '8.3.0'
-    implementation group: 'org.apache.lucene', name: 'lucene-queries', version: '8.3.0'
-    implementation group: 'org.apache.lucene', name: 'lucene-highlighter', version: '8.3.0'
-    implementation group: 'org.apache.lucene', name: 'lucene-grouping', version: '8.3.0'
+    implementation group: 'org.apache.lucene', name: 'lucene-core', version: '3.6.2'
+    implementation group: 'org.apache.lucene', name: 'lucene-queries', version: '3.6.2'
+    implementation group: 'org.apache.lucene', name: 'lucene-highlighter', version: '3.6.2'
+    implementation group: 'org.apache.lucene', name: 'lucene-grouping', version: '3.6.2'
 
 
 

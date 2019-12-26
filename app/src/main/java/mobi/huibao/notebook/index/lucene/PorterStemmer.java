@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 public class PorterStemmer {
     private char[] b;
     private int i, /* offset into b */

@@ -9,7 +9,7 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
 
-public class SegmentWrapper {
+public class IndexSegmentWrapper {
     /**
      * 输入
      */
@@ -39,7 +39,7 @@ public class SegmentWrapper {
      */
     private int remainSize = 0;
 
-    public SegmentWrapper(Reader reader, Segment segment) {
+    public IndexSegmentWrapper(Reader reader, Segment segment) {
         this.input = reader;
         this.segment = segment;
     }
