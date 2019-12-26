@@ -16,6 +16,9 @@
         <item name="windowActionBarOverlay">true</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
+        <item name="actionMenuTextColor">#ffffff</item>
     </style>
 
     <style name="splash" parent="@style/Theme.Design.NoActionBar">

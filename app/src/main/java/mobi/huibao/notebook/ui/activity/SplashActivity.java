@@ -19,7 +19,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        Observable.timer(300, TimeUnit.MILLISECONDS)
+        Observable.timer(100, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         time -> {

@@ -7,18 +7,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.github.tamir7.contacts.Contact;
 import com.github.tamir7.contacts.Contacts;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -28,6 +25,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +39,8 @@ import mobi.huibao.notebook.adapter.ContactsItemAdapter;
 import mobi.huibao.notebook.api.data.ContactsResult;
 import mobi.huibao.notebook.api.presenter.SearchPresenter;
 import mobi.huibao.notebook.events.ContactsListEvent;
+import mobi.huibao.notebook.index.IndexAction;
+import mobi.huibao.notebook.tools.rx.RxTools;
 
 public class ContactsFragment extends Fragment {
 
@@ -66,14 +66,16 @@ public class ContactsFragment extends Fragment {
     }
 
     private void check(ContactsItemAdapter adapter) {
-        new RxPermissions(this).requestEach(Manifest.permission.READ_CONTACTS,
-                Manifest.permission.WRITE_CONTACTS)
+        new RxPermissions(this).requestEach(Manifest.permission.READ_CONTACTS)
                 .subscribe(permission -> {
-
                     DialogInterface.OnClickListener onClickListener = (dialogInterface, i) ->
                             Toast.makeText(getActivity(), "确定按钮", Toast.LENGTH_LONG).show();
 
                     if (permission.granted) {
+
+                        IndexAction indexAction = new IndexAction(getContext());
+                        RxTools.runOnIoThread(indexAction);
+
                         //授权执行的操作,比如读取用户通信录,对通信录进行索引操纵
                         List<Contact> contacts = Contacts.getQuery().find();
                         List<ContactsResult.ContactsItem> itemList = new ArrayList<>(contacts.size());
