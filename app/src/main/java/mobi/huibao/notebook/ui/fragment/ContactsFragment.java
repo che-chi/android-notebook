@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.github.tamir7.contacts.Contact;
 import com.github.tamir7.contacts.Contacts;
@@ -25,7 +24,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +36,8 @@ import mobi.huibao.notebook.R;
 import mobi.huibao.notebook.adapter.ContactsItemAdapter;
 import mobi.huibao.notebook.api.data.ContactsResult;
 import mobi.huibao.notebook.api.presenter.SearchPresenter;
-import mobi.huibao.notebook.events.ContactsListEvent;
-import mobi.huibao.notebook.index.IndexAction;
-import mobi.huibao.notebook.tools.rx.RxTools;
+import mobi.huibao.notebook.events.SearchContactEvent;
+import mobi.huibao.notebook.index.IndexTool;
 
 public class ContactsFragment extends Fragment {
 
@@ -59,12 +56,6 @@ public class ContactsFragment extends Fragment {
         return new ContactsFragment();
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onMessageEvent(ContactsListEvent event) {
-        adapter.addData(event.getList());
-        adapter.notifyDataSetChanged();
-    }
-
     private void check(ContactsItemAdapter adapter) {
         new RxPermissions(this).requestEach(Manifest.permission.READ_CONTACTS)
                 .subscribe(permission -> {
@@ -73,12 +64,11 @@ public class ContactsFragment extends Fragment {
 
                     if (permission.granted) {
 
-                        IndexAction indexAction = new IndexAction(getContext());
-                        RxTools.runOnIoThread(indexAction);
-
                         //授权执行的操作,比如读取用户通信录,对通信录进行索引操纵
                         List<Contact> contacts = Contacts.getQuery().find();
+
                         List<ContactsResult.ContactsItem> itemList = new ArrayList<>(contacts.size());
+
                         for (Contact contact : contacts) {
                             ContactsResult.ContactsItem item = new ContactsResult.ContactsItem(
                                     contact.getId(),
@@ -89,7 +79,10 @@ public class ContactsFragment extends Fragment {
                                     "测试职位");
                             itemList.add(item);
                         }
+
                         adapter.addData(itemList);
+
+                        IndexTool.indexContacts(contacts);
 
                     } else if (permission.shouldShowRequestPermissionRationale) {
                         //拒绝授权,给用户推荐相关联系人信息
@@ -148,12 +141,6 @@ public class ContactsFragment extends Fragment {
         });
     }
 
-    private void eventBusRegister() {
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
-    }
-
     private void initRecyclerView(View rootView) {
         recyclerView = rootView.findViewById(R.id.contact_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -161,6 +148,14 @@ public class ContactsFragment extends Fragment {
         adapter.setEmptyView(R.layout.item_contacts_empty, recyclerView);
         check(adapter);
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
     }
 
     @Override
@@ -173,11 +168,22 @@ public class ContactsFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_contacts, container, false);
         ButterKnife.bind(this, rootView);
 
-        eventBusRegister();
-
         initRecyclerView(rootView);
         initRefreshListener(refresh, adapter);
         return rootView;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSearchContact(SearchContactEvent event) {
+        List<ContactsResult.ContactsItem> contactsItemList = event.getList();
+        LogUtils.d("onSearchContact->" + contactsItemList.size());
+        if (contactsItemList.size() > 0) {
+            adapter.getData().clear();
+            adapter.addData(contactsItemList);
+        } else {
+            Toasty.warning(getContext(), R.string.server_request_fail, Toast.LENGTH_SHORT, false).show();
+        }
+
     }
 
     @Override

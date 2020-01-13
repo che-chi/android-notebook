@@ -14,7 +14,6 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Set;
 
 public class IndexTokenizer extends Tokenizer {
@@ -43,9 +42,8 @@ public class IndexTokenizer extends Tokenizer {
      * @param filter               停用词
      * @param enablePorterStemming 英文原型转换
      */
-    public IndexTokenizer(Segment segment, Set<String> filter, boolean enablePorterStemming, final Reader reader) {
+    public IndexTokenizer(Segment segment, Set<String> filter, boolean enablePorterStemming) {
         super();
-        this.input = reader;
         this.segment = new IndexSegmentWrapper(input, segment);
         if (filter != null && filter.size() > 0) {
             this.filter = new BinTrie<String>();
@@ -108,8 +106,9 @@ public class IndexTokenizer extends Tokenizer {
      * 必须重载的方法，否则在批量索引文件时将会导致文件索引失败
      */
     @Override
-    public void reset(final Reader reader) throws IOException {
-        super.reset(reader);
+    public void reset() throws IOException {
+        super.reset();
         segment.reset(new BufferedReader(this.input));
     }
+
 }

@@ -1,10 +1,10 @@
 package mobi.huibao.notebook.index.lucene;
 
 import com.hankcs.hanlp.HanLP;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
 
-import java.io.Reader;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.Tokenizer;
+
 import java.util.Set;
 
 public class IndexAnalyzer extends Analyzer {
@@ -33,8 +33,9 @@ public class IndexAnalyzer extends Analyzer {
     }
 
     @Override
-    public TokenStream tokenStream(String fieldName, Reader reader) {
-        return new IndexTokenizer(HanLP.newSegment().enableIndexMode(true), filter, pstemming,reader);
+    protected TokenStreamComponents createComponents(String fieldName) {
+        Tokenizer tokenizer = new IndexTokenizer(HanLP.newSegment().enableIndexMode(true), filter, pstemming);
+        return new TokenStreamComponents(tokenizer);
     }
 
 }

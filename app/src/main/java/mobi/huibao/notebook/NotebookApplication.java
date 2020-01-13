@@ -2,14 +2,18 @@ package mobi.huibao.notebook;
 
 import android.app.Application;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.github.tamir7.contacts.Contacts;
 import com.scwang.smartrefresh.header.MaterialHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 
+import java.io.IOException;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import mobi.huibao.notebook.index.IndexTool;
 
 public class NotebookApplication extends Application {
 
@@ -38,5 +42,11 @@ public class NotebookApplication extends Application {
         Fresco.initialize(this);
 
         Contacts.initialize(this);
+
+        try {
+            IndexTool.init(this);
+        } catch (IOException e) {
+            LogUtils.e(e);
+        }
     }
 }

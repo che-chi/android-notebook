@@ -13,10 +13,19 @@ import com.blankj.utilcode.util.LogUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import mobi.huibao.notebook.R;
 import mobi.huibao.notebook.adapter.ContentViewPagerAdapter;
+import mobi.huibao.notebook.api.data.ContactsResult;
+import mobi.huibao.notebook.events.SearchContactEvent;
+import mobi.huibao.notebook.index.IndexTool;
 import mobi.huibao.notebook.ui.fragment.ContactsFragment;
 import mobi.huibao.notebook.ui.fragment.NotebookFragment;
 import mobi.huibao.notebook.ui.fragment.UserFragment;
@@ -67,6 +76,30 @@ public class MainActivity extends RealmActivity implements ViewPager.OnPageChang
         getMenuInflater().inflate(R.menu.contacts_search, menu);
         searchView = (SearchView) menu.findItem(R.id.menu_contact_search).getActionView();
         searchView.setQueryHint("搜索联系人");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String text) {
+                Observable.create((ObservableOnSubscribe<List<ContactsResult.ContactsItem>>) e -> {
+                    List<ContactsResult.ContactsItem> contactsItemList = IndexTool.searchContact(text);
+                    e.onNext(contactsItemList);
+                }).subscribeOn(Schedulers.io()).
+                        observeOn(AndroidSchedulers.mainThread()).
+                        subscribe(
+                                contactsItemList -> {
+                                    SearchContactEvent searchContactEvent = new SearchContactEvent(contactsItemList);
+                                    EventBus.getDefault().post(searchContactEvent);
+                                }
+                        ).isDisposed();
+                LogUtils.d("onQueryTextSubmit->" + text);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String text) {
+                LogUtils.d("onQueryTextChange->" + text);
+                return true;
+            }
+        });
         return true;
     }
 

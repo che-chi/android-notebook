@@ -10,4 +10,5 @@
     <string name="splash_jump_adv">跳过</string>
     <string name="server_request_fail">服务器开小差了,请稍后再试</string>
     <string name="search_item_text">搜索</string>
+    <string name="search_contract_not_found">没有找到任何联系人</string>
 </resources>
